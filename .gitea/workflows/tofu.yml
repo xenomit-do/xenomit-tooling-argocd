@@ -19,11 +19,15 @@ jobs:
       GITEA_OWNER: xenomit
       GITEA_PACKAGE_USER: gitops
       GITEA_BASE_URL: ${{ vars.TOFU_GITEA_BASE_URL }}
+      GITEA_REPOSITORY: ${{ gitea.repository }}
       STATE_PACKAGE: xenomit-platform-argocd-state
       PLAN_PACKAGE: xenomit-platform-argocd-plans
       LOCK_PACKAGE: xenomit-platform-argocd-lock
       PR_NUMBER: ${{ gitea.event.pull_request.number }}
       PR_HEAD_SHA: ${{ gitea.event.pull_request.head.sha }}
+      GITEA_CHECKOUT_REF: ${{ gitea.event.pull_request.head.ref }}
+      GITEA_CHECKOUT_USER: gitops
+      GITEA_CHECKOUT_TOKEN: ${{ secrets.TOFU_GITEA_READ_TOKEN }}
       GITEA_PACKAGE_TOKEN: ${{ secrets.TOFU_GITEA_PACKAGE_TOKEN }}
       TOFU_ARTIFACT_ENCRYPTION_KEY: ${{ secrets.TOFU_ARTIFACT_ENCRYPTION_KEY }}
       TOFU_ARTIFACT_HMAC_KEY: ${{ secrets.TOFU_ARTIFACT_HMAC_KEY }}
@@ -32,10 +36,25 @@ jobs:
       TF_VAR_source_revision: ${{ gitea.event.pull_request.head.sha }}
     steps:
       - name: Check out exact PR head
-        uses: builtin:checkout
-        with:
-          ref: ${{ gitea.event.pull_request.head.sha }}
-          fetch-depth: 0
+        run: |
+          set -eu
+          askpass="$(mktemp)"
+          trap 'rm -f "$askpass"' EXIT
+          cat > "$askpass" <<'ASKPASS'
+          #!/bin/sh
+          case "$1" in
+            *Username*) printf '%s\n' "$GITEA_CHECKOUT_USER" ;;
+            *) printf '%s\n' "$GITEA_CHECKOUT_TOKEN" ;;
+          esac
+          ASKPASS
+          chmod 700 "$askpass"
+          export GIT_ASKPASS="$askpass"
+          export GIT_TERMINAL_PROMPT=0
+          git init -q
+          git remote add origin "$GITEA_BASE_URL/$GITEA_REPOSITORY.git"
+          git fetch --no-tags --depth=1 origin "refs/heads/$GITEA_CHECKOUT_REF"
+          git checkout --detach FETCH_HEAD
+          test "$(git rev-parse HEAD)" = "$PR_HEAD_SHA"
       - name: Install pinned OpenTofu
         run: |
           bash scripts/ci/install-opentofu.sh
@@ -51,10 +70,14 @@ jobs:
       GITEA_OWNER: xenomit
       GITEA_PACKAGE_USER: gitops
       GITEA_BASE_URL: ${{ vars.TOFU_GITEA_BASE_URL }}
+      GITEA_REPOSITORY: ${{ gitea.repository }}
       STATE_PACKAGE: xenomit-platform-argocd-state
       PLAN_PACKAGE: xenomit-platform-argocd-plans
       LOCK_PACKAGE: xenomit-platform-argocd-lock
       PR_NUMBER: ${{ gitea.event.issue.number }}
+      GITEA_CHECKOUT_REF: main
+      GITEA_CHECKOUT_USER: gitops
+      GITEA_CHECKOUT_TOKEN: ${{ secrets.TOFU_GITEA_WRITE_TOKEN }}
       GITEA_WRITE_TOKEN: ${{ secrets.TOFU_GITEA_WRITE_TOKEN }}
       GITEA_PACKAGE_TOKEN: ${{ secrets.TOFU_GITEA_PACKAGE_TOKEN }}
       TOFU_ARTIFACT_ENCRYPTION_KEY: ${{ secrets.TOFU_ARTIFACT_ENCRYPTION_KEY }}
@@ -63,10 +86,24 @@ jobs:
       TF_VAR_repository_url: ${{ vars.ARGOCD_REPOSITORY_URL }}
     steps:
       - name: Check out trusted workflow helpers
-        uses: builtin:checkout
-        with:
-          ref: main
-          fetch-depth: 0
+        run: |
+          set -eu
+          askpass="$(mktemp)"
+          trap 'rm -f "$askpass"' EXIT
+          cat > "$askpass" <<'ASKPASS'
+          #!/bin/sh
+          case "$1" in
+            *Username*) printf '%s\n' "$GITEA_CHECKOUT_USER" ;;
+            *) printf '%s\n' "$GITEA_CHECKOUT_TOKEN" ;;
+          esac
+          ASKPASS
+          chmod 700 "$askpass"
+          export GIT_ASKPASS="$askpass"
+          export GIT_TERMINAL_PROMPT=0
+          git init -q
+          git remote add origin "$GITEA_BASE_URL/$GITEA_REPOSITORY.git"
+          git fetch --no-tags --depth=1 origin "refs/heads/$GITEA_CHECKOUT_REF"
+          git checkout --detach FETCH_HEAD
       - name: Install pinned OpenTofu
         run: |
           bash scripts/ci/install-opentofu.sh
