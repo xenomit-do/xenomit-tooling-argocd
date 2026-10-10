@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: xenomit-actions-docker-data
+  namespace: ci
+  labels:
+    app.kubernetes.io/part-of: xenomit
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 20Gi

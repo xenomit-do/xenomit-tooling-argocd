@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: xenomit-actions-runner
+  namespace: ci
+  labels:
+    app.kubernetes.io/name: xenomit-actions-runner
+    app.kubernetes.io/part-of: xenomit
+spec:
+  replicas: 1
+  progressDeadlineSeconds: 600
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: xenomit-actions-runner
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: xenomit-actions-runner
+        app.kubernetes.io/part-of: xenomit
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: runner
+          image: docker.io/gitea/runner:3.5.0-dind
+          imagePullPolicy: IfNotPresent
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          resources:
+            requests:
+              cpu: "1"
+              memory: 2Gi
+            limits:
+              cpu: "9"
+              memory: 18Gi
+          securityContext:
+            privileged: true
+          env:
+            - name: GITEA_INSTANCE_URL
+              value: http://gitea.git.svc.cluster.local:3000
+            - name: GITEA_RUNNER_NAME
+              value: xenomit-gitea-dind
+            - name: GITEA_RUNNER_REGISTRATION_TOKEN_FILE
+              value: /run/secrets/gitea-runner/token
+            - name: CONFIG_FILE
+              value: /config/config.yaml
+          volumeMounts:
+            - name: runner-data
+              mountPath: /data
+            - name: docker-data
+              mountPath: /var/lib/docker
+            - name: runner-config
+              mountPath: /config/config.yaml
+              subPath: config.yaml
+              readOnly: true
+            - name: docker-config
+              mountPath: /etc/docker/daemon.json
+              subPath: daemon.json
+              readOnly: true
+            - name: runner-token
+              mountPath: /run/secrets/gitea-runner
+              readOnly: true
+      volumes:
+        - name: runner-data
+          persistentVolumeClaim:
+            claimName: xenomit-actions-runner-data
+        - name: docker-data
+          persistentVolumeClaim:
+            claimName: xenomit-actions-docker-data
+        - name: runner-config
+          configMap:
+            name: xenomit-actions-runner-config
+        - name: docker-config
+          configMap:
+            name: xenomit-actions-docker-config
+        - name: runner-token
+          secret:
+            secretName: xenomit-actions-runner-token
+            defaultMode: 256
