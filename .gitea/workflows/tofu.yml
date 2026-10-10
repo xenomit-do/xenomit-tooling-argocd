@@ -16,7 +16,7 @@ jobs:
     runs-on: xenomit
     env:
       PROJECT_KEY: argocd
-      GITEA_OWNER: gitops
+      GITEA_OWNER: xenomit
       GITEA_PACKAGE_USER: gitops
       GITEA_BASE_URL: ${{ vars.TOFU_GITEA_BASE_URL }}
       STATE_PACKAGE: xenomit-platform-argocd-state
@@ -24,7 +24,7 @@ jobs:
       LOCK_PACKAGE: xenomit-platform-argocd-lock
       PR_NUMBER: ${{ gitea.event.pull_request.number }}
       PR_HEAD_SHA: ${{ gitea.event.pull_request.head.sha }}
-      GITEA_PACKAGE_TOKEN: ${{ secrets.GITEA_PACKAGE_TOKEN }}
+      GITEA_PACKAGE_TOKEN: ${{ secrets.TOFU_GITEA_PACKAGE_TOKEN }}
       TOFU_ARTIFACT_ENCRYPTION_KEY: ${{ secrets.TOFU_ARTIFACT_ENCRYPTION_KEY }}
       TOFU_ARTIFACT_HMAC_KEY: ${{ secrets.TOFU_ARTIFACT_HMAC_KEY }}
       TF_VAR_argocd_auth_token: ${{ secrets.ARGOCD_READ_AUTH_TOKEN }}
@@ -48,15 +48,15 @@ jobs:
     runs-on: xenomit
     env:
       PROJECT_KEY: argocd
-      GITEA_OWNER: gitops
+      GITEA_OWNER: xenomit
       GITEA_PACKAGE_USER: gitops
       GITEA_BASE_URL: ${{ vars.TOFU_GITEA_BASE_URL }}
       STATE_PACKAGE: xenomit-platform-argocd-state
       PLAN_PACKAGE: xenomit-platform-argocd-plans
       LOCK_PACKAGE: xenomit-platform-argocd-lock
       PR_NUMBER: ${{ gitea.event.issue.number }}
-      GITEA_WRITE_TOKEN: ${{ secrets.GITEA_WRITE_TOKEN }}
-      GITEA_PACKAGE_TOKEN: ${{ secrets.GITEA_PACKAGE_TOKEN }}
+      GITEA_WRITE_TOKEN: ${{ secrets.TOFU_GITEA_WRITE_TOKEN }}
+      GITEA_PACKAGE_TOKEN: ${{ secrets.TOFU_GITEA_PACKAGE_TOKEN }}
       TOFU_ARTIFACT_ENCRYPTION_KEY: ${{ secrets.TOFU_ARTIFACT_ENCRYPTION_KEY }}
       TOFU_ARTIFACT_HMAC_KEY: ${{ secrets.TOFU_ARTIFACT_HMAC_KEY }}
       TF_VAR_argocd_auth_token: ${{ secrets.ARGOCD_WRITE_AUTH_TOKEN }}
