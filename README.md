@@ -8,6 +8,8 @@ This stack manages the `xenomit-platform-runners` AppProject and `xenomit-action
 
 Atlantis automatically plans OpenTofu changes for pull requests. Review its plan comment, then reply `atlantis apply` when ready. With `automerge: true`, Atlantis merges after all plans for the pull request have applied successfully.
 
+The runner Application tracks main so Atlantis can apply and merge the PR without waiting for runner resources from the unmerged PR head.
+
 ## State and credentials
 
 OpenTofu state is stored in the Kubernetes backend in namespace `atlantis-state`, using a separate suffix for this repository. Atlantis receives a one-year token for the existing `xenomit-tofu` ArgoCD account. That account can read ArgoCD resources and create/update only the runner AppProject and Application. The token is stored in Kubernetes Secret `ci/atlantis-iac`, not in Git.
