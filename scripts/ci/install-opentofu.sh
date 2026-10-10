@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 TOFU_VERSION="1.12.6"
-ARCHIVE="tofu_$TOFU_VERSION_linux_amd64.tar.gz"
+ARCHIVE="tofu_${TOFU_VERSION}_linux_amd64.tar.gz"
 SUMS_FILE="tofu_$TOFU_VERSION""_SHA256SUMS"
 BASE_URL="https://get.opentofu.org/tofu/$TOFU_VERSION"
 TMP_DIR="$(mktemp -d)"
