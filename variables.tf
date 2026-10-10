@@ -13,7 +13,7 @@ variable "argocd_auth_token" {
 variable "repository_url" {
   description = "Private Gitea repository URL readable by ArgoCD."
   type        = string
-  default     = "http://gitea.git.svc.cluster.local:3000/gitops/xenomit-platform-argocd"
+  default     = "http://gitea.git.svc.cluster.local:3000/xenomit/xenomit-platform-argocd"
 }
 
 variable "source_revision" {

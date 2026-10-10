@@ -14,22 +14,24 @@ The runner remains on its existing Gitea Actions label xenomit. The workflow job
 
 ## Gitea setup
 
-Create a private repository named xenomit-platform-argocd under gitops, then push main. The xenomit-platform-gitea stack creates branch protection and manages both platform repository shells.
+The private xenomit-platform-argocd repository lives under the xenomit organization, whose Owners team can access all organization repositories. The xenomit-platform-gitea stack manages branch protection and both platform repository shells.
 
 Set the Gitea repository variable TOFU_GITEA_BASE_URL to the internal origin reachable from runner jobs, without a trailing slash. The current cluster service is http://gitea.git.svc.cluster.local:3000.
 
-Set the repository variable ARGOCD_REPOSITORY_URL to the clone URL ArgoCD can use, for example http://gitea.git.svc.cluster.local:3000/gitops/xenomit-platform-argocd. ArgoCD must already have a repository credential template or repository entry that can read this private Gitea repository.
+Set the repository variable ARGOCD_REPOSITORY_URL to the clone URL ArgoCD can use, for example http://gitea.git.svc.cluster.local:3000/xenomit/xenomit-platform-argocd. ArgoCD must already have a repository credential template or repository entry that can read this private Gitea repository.
 
 Create these Actions secrets:
 
-- GITEA_WRITE_TOKEN: repository write/admin token used to publish encrypted state and merge the PR.
-- GITEA_PACKAGE_TOKEN: package read/write token for the gitops account.
+- TOFU_GITEA_WRITE_TOKEN: gitops token with repository and issue read/write scopes, used to publish encrypted state, set commit status, and merge. Gitea token scopes apply across repositories that gitops can access.
+- TOFU_GITEA_PACKAGE_TOKEN: package read/write token for the gitops account.
 - TOFU_ARTIFACT_ENCRYPTION_KEY: 64 hexadecimal characters.
 - TOFU_ARTIFACT_HMAC_KEY: a different 64 hexadecimal characters.
 - ARGOCD_READ_AUTH_TOKEN: read-only ArgoCD token for plan/refresh.
-- ARGOCD_WRITE_AUTH_TOKEN: token allowed to create/update the platform project and runner Application.
+- ARGOCD_WRITE_AUTH_TOKEN: one-year token for the xenomit-tofu API account. It has read-only access plus write access limited to the xenomit-platform-runners project and xenomit-actions-runner Application.
 
 Generate artifact keys independently with openssl rand -hex 32. The runner job container uses host networking and must resolve argocd-server.argocd.svc.cluster.local:80. The ArgoCD API is configured as plain HTTP inside the cluster.
+
+The ArgoCD controller exposes the existing viewer account for read-only plans. The xenomit-tofu account is enabled for API keys in argocd-cm and mapped to role:readonly plus writes for only the runner AppProject and Application in argocd-rbac-cm. Rotate both ArgoCD API tokens before their one-year expiry.
 
 ## Approval flow
 
