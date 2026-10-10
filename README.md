@@ -35,6 +35,6 @@ The ArgoCD controller exposes the existing viewer account for read-only plans. T
 
 ## Approval flow
 
-A same-repository PR authored by gitops targeting main triggers an OpenTofu plan for its exact head SHA. The plan and state are encrypted and stored as private Gitea generic packages. Reply with the exact comment /tofu apply to apply the saved plan. Apply fails when the PR head or state generation changed, and merges with the expected head SHA only after ArgoCD reports the runner Application healthy.
+Any same-repository PR targeting main triggers an OpenTofu plan for its exact head SHA. The plan and state are encrypted and stored as private Gitea generic packages. Reply with the exact comment /tofu apply as gitops to apply the saved plan. Apply fails when the PR head or state generation changed, and merges with the expected head SHA only after ArgoCD reports the runner Application healthy.
 
 The lock serializes plans and applies. If a runner is killed and leaves an active lock package, remove that package version only after confirming no job is running. Do not delete state versions. The local OpenTofu state and plan files are excluded from Git.

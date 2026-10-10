@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   plan:
-    if: ${{ gitea.event_name == 'pull_request' && gitea.event.pull_request.head.repo.full_name == gitea.repository && gitea.event.pull_request.user.login == 'gitops' }}
+    if: ${{ gitea.event_name == 'pull_request' && gitea.event.pull_request.head.repo.full_name == gitea.repository }}
     runs-on: xenomit
     env:
       PROJECT_KEY: argocd
