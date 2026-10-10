@@ -74,4 +74,4 @@ echo "Applied the saved plan and merged PR $PR_NUMBER at $PR_HEAD_SHA."
   echo "## OpenTofu apply"
   echo
   echo "Applied state generation $STATE_GENERATION and merged PR $PR_NUMBER at $PR_HEAD_SHA."
-} >> "$GITEA_STEP_SUMMARY"
+} >> "${GITEA_STEP_SUMMARY:-${GITHUB_STEP_SUMMARY:-/dev/null}}"

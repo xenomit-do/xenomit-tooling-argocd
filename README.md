@@ -16,7 +16,7 @@ The runner remains on its existing Gitea Actions label xenomit. The workflow job
 
 Create a private repository named xenomit-platform-argocd under gitops, then push main. The xenomit-platform-gitea stack creates branch protection and manages both platform repository shells.
 
-Set the Gitea repository variable GITEA_BASE_URL to the internal origin reachable from runner jobs, without a trailing slash. The current cluster service is http://gitea.git.svc.cluster.local:3000.
+Set the Gitea repository variable TOFU_GITEA_BASE_URL to the internal origin reachable from runner jobs, without a trailing slash. The current cluster service is http://gitea.git.svc.cluster.local:3000.
 
 Set the repository variable ARGOCD_REPOSITORY_URL to the clone URL ArgoCD can use, for example http://gitea.git.svc.cluster.local:3000/gitops/xenomit-platform-argocd. ArgoCD must already have a repository credential template or repository entry that can read this private Gitea repository.
 

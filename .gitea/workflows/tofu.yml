@@ -18,7 +18,7 @@ jobs:
       PROJECT_KEY: argocd
       GITEA_OWNER: gitops
       GITEA_PACKAGE_USER: gitops
-      GITEA_BASE_URL: ${{ vars.GITEA_BASE_URL }}
+      GITEA_BASE_URL: ${{ vars.TOFU_GITEA_BASE_URL }}
       STATE_PACKAGE: xenomit-platform-argocd-state
       PLAN_PACKAGE: xenomit-platform-argocd-plans
       LOCK_PACKAGE: xenomit-platform-argocd-lock
@@ -32,7 +32,7 @@ jobs:
       TF_VAR_source_revision: ${{ gitea.event.pull_request.head.sha }}
     steps:
       - name: Check out exact PR head
-        uses: actions/checkout@v4
+        uses: builtin:checkout
         with:
           ref: ${{ gitea.event.pull_request.head.sha }}
           fetch-depth: 0
@@ -50,7 +50,7 @@ jobs:
       PROJECT_KEY: argocd
       GITEA_OWNER: gitops
       GITEA_PACKAGE_USER: gitops
-      GITEA_BASE_URL: ${{ vars.GITEA_BASE_URL }}
+      GITEA_BASE_URL: ${{ vars.TOFU_GITEA_BASE_URL }}
       STATE_PACKAGE: xenomit-platform-argocd-state
       PLAN_PACKAGE: xenomit-platform-argocd-plans
       LOCK_PACKAGE: xenomit-platform-argocd-lock
@@ -63,7 +63,7 @@ jobs:
       TF_VAR_repository_url: ${{ vars.ARGOCD_REPOSITORY_URL }}
     steps:
       - name: Check out trusted workflow helpers
-        uses: actions/checkout@v4
+        uses: builtin:checkout
         with:
           ref: main
           fetch-depth: 0

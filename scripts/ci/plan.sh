@@ -14,7 +14,7 @@ fi
 PLAN_FILE="$RUNNER_TEMP/$PROJECT_KEY-$PR_HEAD_SHA.tfplan"
 tofu plan -input=false -no-color -out="$PLAN_FILE"
 publish_plan "$PLAN_FILE" "$PR_HEAD_SHA"
-SUMMARY_FILE="${GITEA_STEP_SUMMARY:-$GITHUB_STEP_SUMMARY}"
+SUMMARY_FILE="${GITEA_STEP_SUMMARY:-${GITHUB_STEP_SUMMARY:-/dev/null}}"
 {
   echo "## OpenTofu plan"
   echo
