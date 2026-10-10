@@ -1,3 +1,11 @@
+terraform {
+  backend "kubernetes" {
+    namespace         = "atlantis-state"
+    secret_suffix     = "xenomit-platform-argocd"
+    in_cluster_config = true
+  }
+}
+
 provider "argocd" {
   server_addr = var.argocd_server
   auth_token  = var.argocd_auth_token
@@ -53,7 +61,7 @@ resource "argocd_application" "runner" {
   }
 
   cascade = false
-  wait    = true
+  wait    = false
 
   spec {
     project = argocd_project.runner.metadata[0].name
@@ -66,7 +74,7 @@ resource "argocd_application" "runner" {
     source {
       repo_url        = var.repository_url
       path            = "deploy/runner"
-      target_revision = var.source_revision
+      target_revision = "main"
     }
 
     sync_policy {

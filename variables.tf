@@ -5,7 +5,7 @@ variable "argocd_server" {
 }
 
 variable "argocd_auth_token" {
-  description = "ArgoCD API token supplied by the workflow."
+  description = "Scoped xenomit-tofu API token supplied by Atlantis."
   type        = string
   sensitive   = true
 }
@@ -14,12 +14,6 @@ variable "repository_url" {
   description = "Private Gitea repository URL readable by ArgoCD."
   type        = string
   default     = "http://gitea.git.svc.cluster.local:3000/xenomit/xenomit-platform-argocd"
-}
-
-variable "source_revision" {
-  description = "Git revision deployed by the runner Application."
-  type        = string
-  default     = "main"
 }
 
 variable "cluster_server" {
