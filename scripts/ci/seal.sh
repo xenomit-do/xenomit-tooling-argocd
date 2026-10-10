@@ -1,10 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 MODE="$1"
-INPUT="$2"
-SEALED="$3"
-HMAC_FILE="$4"
-OUTPUT="$5"
+if [[ "$MODE" == "seal" ]]; then
+  [[ "$#" -eq 4 ]] || { echo "Usage: seal.sh seal input sealed-file hmac-file | seal.sh open sealed-file hmac-file output" >&2; exit 2; }
+  INPUT="$2"
+  SEALED="$3"
+  HMAC_FILE="$4"
+else
+  [[ "$MODE" == "open" && "$#" -eq 4 ]] || { echo "Usage: seal.sh seal input sealed-file hmac-file | seal.sh open sealed-file hmac-file output" >&2; exit 2; }
+  SEALED="$2"
+  HMAC_FILE="$3"
+  OUTPUT="$4"
+fi
 : "${TOFU_ARTIFACT_ENCRYPTION_KEY:?missing encryption key}"
 : "${TOFU_ARTIFACT_HMAC_KEY:?missing HMAC key}"
 [[ "$TOFU_ARTIFACT_ENCRYPTION_KEY" =~ ^[0-9a-fA-F]{64}$ ]] || { echo "Encryption key must be 64 hex characters." >&2; exit 2; }
