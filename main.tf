@@ -1,4 +1,5 @@
 terraform {
+  # Host bootstrap overrides the connection with -backend-config (see ops/bootstrap.ps1).
   backend "kubernetes" {
     namespace         = "atlantis-state"
     secret_suffix     = "xenomit-platform-argocd"
@@ -10,6 +11,7 @@ provider "argocd" {
   server_addr = var.argocd_server
   auth_token  = var.argocd_auth_token
   plain_text  = true
+  grpc_web    = true
 }
 
 resource "argocd_project" "runner" {
